@@ -12,6 +12,11 @@
 use core::panic::PanicInfo;
 use qemu_exit::QEMUExit;
 
+use crate::mem::alloc::init_heap;
+
+extern crate alloc;
+
+mod mem;
 mod uart;
 mod vectors;
 
@@ -61,6 +66,7 @@ core::arch::global_asm!(
 
 #[unsafe(no_mangle)]
 extern "C" fn main() -> ! {
+    init_heap();
     println!("hey there");
     println!("this is an example project");
     println!("its just enough to get working on whatever you wanna do");
