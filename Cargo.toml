@@ -1,5 +1,5 @@
 [package]
-name = "aarch64_base_project_rs"
+name = "bare_apple"
 version = "0.1.0"
 edition = "2024"
 
