@@ -39,23 +39,23 @@ core::arch::global_asm!(
         bl main                        // go to rust entry point
         b .                            // hang forever
         
-        load_stack:
-            ldr x0, =el1_stack_top
-            mov sp, x0
-            ret
+    load_stack:
+        ldr x0, =el1_stack_top
+        mov sp, x0
+        ret
         
-        enable_fpu:
-            mrs x0, CPACR_EL1
-            orr x0, x0, #(3 << 20)     // enable fp in el1 and el0
-            msr CPACR_EL1, x0
-            isb
-            ret
+    enable_fpu:
+        mrs x0, CPACR_EL1
+        orr x0, x0, #(3 << 20)     // enable fp in el1 and el0
+        msr CPACR_EL1, x0
+        isb
+        ret
         
-        setup_vtable:
-            ldr x0, =_vector_table     // load vtable into r0
-            msr VBAR_EL1, x0
-            isb                        // move r0 to base vector table register
-            ret
+    setup_vtable:
+        ldr x0, =_vector_table     // load vtable into r0
+        msr VBAR_EL1, x0
+        isb                        // move r0 to base vector table register
+        ret
     "
 );
 
