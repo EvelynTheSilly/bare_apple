@@ -17,6 +17,7 @@ use crate::mem::alloc::init_heap;
 extern crate alloc;
 
 mod mem;
+mod ramfb;
 mod uart;
 mod vectors;
 
@@ -37,8 +38,6 @@ core::arch::global_asm!(
         bl enable_fpu
         
         bl setup_vtable
-        
-        mov x0, x20
         
         // enter rust
         bl main                        // go to rust entry point
@@ -64,13 +63,35 @@ core::arch::global_asm!(
     "
 );
 
+const FBHEIGHT: u32 = 800;
+const FBWIDTH: u32 = 800;
+
+static mut BUFFER: [u32; (FBHEIGHT * FBWIDTH) as usize] = [0; (FBHEIGHT * FBWIDTH) as usize];
+
+const fn rgba_to_fb_color(r: u8, g: u8, b: u8, a: u8) -> u32 {
+    (r as u32) | ((g as u32) << 8) | ((b as u32) << 16) | ((a as u32) << 24)
+}
+
 #[unsafe(no_mangle)]
 extern "C" fn main() -> ! {
     init_heap();
+    unsafe {
+        let buffer_pointer = core::ptr::addr_of_mut!(BUFFER) as *mut u8;
+        ramfb::setup_ramfb(buffer_pointer, FBWIDTH, FBHEIGHT);
+        let mut flip = true;
+        for x in 0..(FBWIDTH * FBHEIGHT) {
+            if flip {
+                buffer_pointer.add((x * 4) as usize).write_volatile(0xFF);
+            } else {
+                buffer_pointer.add((x * 4) as usize).write_volatile(0x00);
+            }
+            flip = !flip;
+        }
+    }
     println!("hey there");
     println!("this is an example project");
     println!("its just enough to get working on whatever you wanna do");
     println!("have fun <3");
     println!("");
-    panic!("main end reached");
+    loop {}
 }

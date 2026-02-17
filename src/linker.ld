@@ -14,7 +14,7 @@ SECTIONS
     .rodata : {
         *(.rodata)
     }
-	. = . + 0x100000; /* 4kB of stack memory */
+	. = . + 0x1000000; 
 	. = ALIGN(16);
 	el1_stack_top = .;
 }
